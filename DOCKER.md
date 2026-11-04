@@ -6,11 +6,11 @@ SQLite-драйвер написан на Go, поэтому приложени�
 Приложение запускается непривилегированным пользователем из `/app`;
 этому пользователю доступны запись в базу и создание SQLite journal.
 
-Замените `YOUR_DOCKER_ID` своим логином Docker Hub:
+Docker ID владельца: `distales`. Сборка и запуск образа с тегом `v1`:
 
 ```sh
-docker build --tag YOUR_DOCKER_ID/parcel-tracker:v1 .
-docker run --name parcel-tracker YOUR_DOCKER_ID/parcel-tracker:v1
+docker build --tag distales/parcel-tracker:v1 .
+docker run --name parcel-tracker distales/parcel-tracker:v1
 docker logs parcel-tracker
 docker inspect --format '{{.State.ExitCode}}' parcel-tracker
 ```

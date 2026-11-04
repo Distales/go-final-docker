@@ -23,12 +23,12 @@ jobs:
           go vet ./...
           git restore tracker.db
       - name: Build image
-        run: docker build --tag parcel-tracker:v1 .
+        run: docker build --tag distales/parcel-tracker:v1 .
       - name: Run and check SQLite operations
         shell: bash
         run: |
           set -euo pipefail
-          docker run --name parcel-tracker parcel-tracker:v1 | tee /tmp/parcel-tracker.log
+          docker run --name parcel-tracker distales/parcel-tracker:v1 | tee /tmp/parcel-tracker.log
           test "$(docker inspect --format '{{.State.ExitCode}}' parcel-tracker)" = "0"
           test "$(grep -c 'Новая посылка №' /tmp/parcel-tracker.log)" = "2"
           test "$(grep -c 'Посылки клиента 1:' /tmp/parcel-tracker.log)" = "3"
