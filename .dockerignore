@@ -1,0 +1,8 @@
+.git
+.github
+*.md
+*_test.go
+*.exe
+*.test
+*.out
+tracker.db-*

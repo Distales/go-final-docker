@@ -1,0 +1,38 @@
+name: Docker check
+
+on:
+  push:
+    branches: [feature/docker]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Test application
+        run: |
+          go test ./...
+          go vet ./...
+          git restore tracker.db
+      - name: Build image
+        run: docker build --tag parcel-tracker:v1 .
+      - name: Run and check SQLite operations
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --name parcel-tracker parcel-tracker:v1 | tee /tmp/parcel-tracker.log
+          test "$(docker inspect --format '{{.State.ExitCode}}' parcel-tracker)" = "0"
+          test "$(grep -c 'Новая посылка №' /tmp/parcel-tracker.log)" = "2"
+          test "$(grep -c 'Посылки клиента 1:' /tmp/parcel-tracker.log)" = "3"
+          grep -q 'новый статус: sent' /tmp/parcel-tracker.log
+          if grep -Eq 'SQL logic error|unable to open|readonly database|permission denied' /tmp/parcel-tracker.log; then
+            exit 1
+          fi
